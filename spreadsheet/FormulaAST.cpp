@@ -1,4 +1,4 @@
-﻿#include "FormulaAST.h"
+#include "FormulaAST.h"
 
 #include "FormulaBaseListener.h"
 #include "FormulaLexer.h"
@@ -148,30 +148,31 @@ namespace ASTImpl {
 
             double Evaluate(const SheetInterface& sheet /*добавьте нужные аргументы*/) const override {
                 // Скопируйте ваше решение из предыдущих уроков.
-                if (type_ == Type::Add)
+                auto l_value = lhs_.get()->Evaluate(sheet);
+                auto r_value = rhs_.get()->Evaluate(sheet);
+
+                switch (type_)
                 {
-                    return lhs_.get()->Evaluate(sheet) + rhs_.get()->Evaluate(sheet);
-                }
-                else if (type_ == Type::Subtract)
+                case Type::Add:
+                    return l_value + r_value;
+                case Type::Subtract:
+                    return l_value - r_value;
+                case Type::Multiply:
+                    return l_value * r_value;
+                case Type::Divide:
                 {
-                    return lhs_.get()->Evaluate(sheet) - rhs_.get()->Evaluate(sheet);
-                }
-                else if (type_ == Type::Multiply)
-                {
-                    return lhs_.get()->Evaluate(sheet) * rhs_.get()->Evaluate(sheet);
-                }
-                else if (type_ == Type::Divide)
-                {
+                    double res = l_value / r_value;
+
                     // При делении на 0 выбрасывайте ошибку вычисления FormulaError
-                    double res_r = rhs_.get()->Evaluate(sheet);
-                    if (res_r == 0.0)
+                    if (!std::isfinite(res))
                     {
                         throw FormulaError(FormulaError::Category::Arithmetic);
                     }
-                    return lhs_.get()->Evaluate(sheet) / res_r;
+                    return res;
                 }
-                return 0.0;
-
+                default:
+                    return 0.0;
+                }
             }
 
         private:
@@ -252,7 +253,6 @@ namespace ASTImpl {
             double Evaluate(const SheetInterface& sheet /*добавьте нужные аргументы args*/) const override {
                 const Cell* cell = (Cell*)(sheet.GetCell(*cell_));
                 
-//                if (cell->GetText() == "")
                 if (!cell)
                 {
                     ((Sheet*)(&sheet))->SetCell(*cell_, "=0");
