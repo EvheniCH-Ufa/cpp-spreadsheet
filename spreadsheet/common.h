@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iosfwd>
 #include <memory>
@@ -39,7 +39,7 @@ public:
     enum class Category {
         Ref,    // ссылка на ячейку с некорректной позицией
         Value,  // ячейка не может быть трактована как число
-        Div0,  // в результате вычисления возникло деление на ноль
+        Arithmetic,  // некорректная арифметическая операция
     };
 
     FormulaError(Category category);
