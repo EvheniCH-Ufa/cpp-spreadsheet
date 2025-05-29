@@ -93,8 +93,8 @@ CellInterface* Sheet::GetCell(Position pos)
     return GetCellData(pos);
 }
 
-//î÷èùàåò ÿ÷åéêó ïî èíäåêñó. Ïîñëåäóşùèé âûçîâ GetCell() äëÿ ıòîé ÿ÷åéêè âåğí¸ò nullptr.
-//Ïğè ıòîì ìîæåò èçìåíèòüñÿ ğàçìåğ ìèíèìàëüíîé ïå÷àòíîé îáëàñòè.
+//Ğ¾Ñ‡Ğ¸Ñ‰Ğ°ĞµÑ‚ ÑÑ‡ĞµĞ¹ĞºÑƒ Ğ¿Ğ¾ Ğ¸Ğ½Ğ´ĞµĞºÑÑƒ. ĞŸĞ¾ÑĞ»ĞµĞ´ÑƒÑÑ‰Ğ¸Ğ¹ Ğ²Ñ‹Ğ·Ğ¾Ğ² GetCell() Ğ´Ğ»Ñ ÑÑ‚Ğ¾Ğ¹ ÑÑ‡ĞµĞ¹ĞºĞ¸ Ğ²ĞµÑ€Ğ½Ñ‘Ñ‚ nullptr.
+//ĞŸÑ€Ğ¸ ÑÑ‚Ğ¾Ğ¼ Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒÑÑ Ñ€Ğ°Ğ·Ğ¼ĞµÑ€ Ğ¼Ğ¸Ğ½Ğ¸Ğ¼Ğ°Ğ»ÑŒĞ½Ğ¾Ğ¹ Ğ¿ĞµÑ‡Ğ°Ñ‚Ğ½Ğ¾Ğ¹ Ğ¾Ğ±Ğ»Ğ°ÑÑ‚Ğ¸.
 void Sheet::ClearCell(Position pos)
 {
     if (!pos.IsValid())
@@ -170,18 +170,10 @@ void Sheet::PrintCellData(std::ostream& output, PrintDataType print_data_type) c
             if (print_data_type == PrintDataType::VALUE)
             {
                 const auto var_result = table_.at({ i, j }).get()->GetValue();
-                if (var_result.index() == 0)
-                {
-                    output << std::get<0>(var_result);
-                }
-                else if (var_result.index() == 1)
-                {
-                    output << std::get<1>(var_result);
-                }
-                else
-                {
-                    output << std::get<2>(var_result);
-                }
+         
+                std::visit([&output](const auto& value) {
+                    output << value;
+                    }, var_result);
             }
             else
             {
